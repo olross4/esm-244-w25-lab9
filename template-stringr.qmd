@@ -1,5 +1,15 @@
 ---
-title: "Template
+title: "Lab 9- Text Files"
+author: "Olivia Ross" 
+format:
+    html:
+        embed-resources: true
+        code-fold: show
+        toc: true
+theme: darkly
+execute:
+  message: false
+  warning: false
 ---
 
 ```{r setup}
@@ -24,7 +34,6 @@ vec <- c("  A Unicorn     Fish",
          " Herbivore Carnivore  ",
          "  French FRIES", 
          " acorn squash  ")
-
 ```
 
 
@@ -32,18 +41,24 @@ vec <- c("  A Unicorn     Fish",
 
 It can also be useful to update the *case* of strings in your code. Since, for example, "Fish" will be seen entirely differently from "fish". We can use the `str_to_*()` functions to change the case.
 
--   `str_to_lower()`
--   `str_to_upper()`
--   `str_to_title()`
--   `str_trim()`
--   `str_squish()`
+-   `str_to_lower()': changes each word to lower case
+-   `str_to_upper()`: changes each word to upper case
+-   `str_to_title(): first letter after a space is capitalized
+-   `str_trim()`: trims spaces before or after character
+-   `str_squish()`: once space between words
 
 Apply each function individually to the `vec` object. Describe what each function does.
 
+```{r}
+vec
+str_to_lower <- str_to_lower(vec)
+str_to_lower
 
+str_to_title <- str_to_title(vec)
+str_to_title
 
-
-
+str_trim(vec)
+```
 
 ### Detect a pattern
 
@@ -53,21 +68,24 @@ Use `stringr::str_detect()` to detect a string pattern. For example, if I want t
 ```{r}
 # detect a string pattern: 
 str_detect(vec, pattern = "corn")
+# for each character, do we see corn?
 
+vec |>
+  str_to_lower() |>
+  str_detect(pattern = "corn")
 ```
 
 We see that it returns a T/F vector indicating whether or not the pattern "corn" exists within each element of the vector.
 
 How might we use that in a data frame? It can be helpful to use `str_detect()` within `filter()` to only keep observations that contain that pattern in the specified variable.
 
-
-
 Now use `filter()` and `str_detect()` to filter only characters whose name is Skywalker from the `starwars` dataset. Using "walk" as your pattern.
 
 ```{r}
-
+starwars |>
+  filter(str_detect(name, pattern = "walk"))
+  
 ```
-
 
 ### First Regex
 
@@ -95,7 +113,9 @@ cap_subset <- starwars |>
 Use `stringr::str_replace()` to replace a pattern with something else.
 
 ```{r}
-str_replace(vec, pattern = "r", replacement = "ARRR") ### first instance only
+str_replace(vec, pattern = "r", replacement = "ARRR") ### replaces first instance only
+
+# use replace_all to replace all instances in each string 
 str_replace_all(vec, pattern = "a", replacement = "ZZZ")
 ```
 
@@ -103,19 +123,20 @@ In the `starwars` data, let's replace any "Sky" string pattern with "CIELO", ove
 
 ```{r}
 
+sw_cielo <- starwars |> 
+  mutate(name = str_replace(name, pattern = "Sky", replacement = "CIELO"))
 ```
-
-
 
 And we can use these things in combination, usually within `mutate()` if it's to update a column in a data frame.
 
 Use your data wrangling skills to turn all names in the `starwars` data to lower case. Then filter out all the Sith with "Darth" titles in their names. Finally, bring balance to the force and change their names to "happy".
 
 ```{r}
-
+happy <- starwars |>
+  mutate(name = str_to_lower(name)) |>
+  filter(str_detect(name, pattern = "darth")) |>
+  mutate(name = str_replace(name, pattern = "darth", replacement = "happy"))
 ```
-
-
 
 Here's another example with regex. Best way to interpret the cat walking is look for any lower or uppercase w followed by a b or a. Remove everything after the last observed letter.
 
